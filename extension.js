@@ -89,6 +89,7 @@ const WallpaperChangerEntry = new Lang.Class({
 
   _nextWallpaper: function () {
     this.provider.next(Lang.bind(this, this._setWallpaper));
+    this.ptrovider.next(Lang.bind(this, this._setScreenSaver));
     this._resetTimer();
   },
 
@@ -155,6 +156,23 @@ const WallpaperChangerEntry = new Lang.Class({
       }
     } else {
       Utils.debug('Can\'t write to org.gnome.desktop.background', this.__name__);
+    }
+  }
+});
+
+ _setScreenSaver: function (path) {
+    Utils.debug('_setScreenSaver', this.__name__);
+    const screensaver_setting = new Gio.Settings({ schema: 'org.gnome.desktop.screensaver' });
+
+    if (screensaver_setting.is_writable('picture-uri')) {
+      if (screensaver_setting.set_string('picture-uri', 'file://' + path)) {
+        Utils.debug(path, this.__name__);
+        Gio.Settings.sync();
+      } else {
+        Utils.debug('Unable to set ScreenSaver', this.__name__)
+      }
+    } else {
+      Utils.debug('Can\'t write to org.gnome.desktop.screensaver', this.__name__);
     }
   }
 });
